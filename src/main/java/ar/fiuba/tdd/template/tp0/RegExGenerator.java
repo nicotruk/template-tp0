@@ -43,10 +43,18 @@ public class RegExGenerator {
             Character character = regEx.charAt(position);
             if (quantityCharacters.containsKey(character)){
                 quantityCharacter = quantityCharacters.get(character);
-                quantityCharacter.generateSequence(charSet.toString());
-            } if(EscapeCharacters.isEscapeCharacter(character)) {
+                quantityCharacter.setCharSet(charSet.toString());
+                result.append(quantityCharacter.generateSequence(charSet.toString()));
+            } else if(EscapeCharacters.isEscapeCharacter(character)) {
                 result.append(regEx.charAt(position+1));
                 position+=1;
+            } else if(GroupCharacters.isGroupCharacter(character)) {
+                Character endCharacter = GroupCharacters.getEndCharacterOf(character);
+                Character nextCharacter = regEx.charAt(++position);
+                while(!nextCharacter.equals(endCharacter)){
+                    charSet.append(nextCharacter);
+                    nextCharacter = regEx.charAt(++position);
+                }
             } else {
                 if(previousChar!=null) {
                     result.append(previousChar);

@@ -1,5 +1,6 @@
 package ar.fiuba.tdd.template.tp0;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ public abstract class QuantityCharacter {
     private Random random = new Random();
 
     public QuantityCharacter(String character, Integer minQuantity, Integer maxQuantity){
+        this.charSet = new ArrayList<>();
         this.character = character;
         this.quantity = random.nextInt(maxQuantity-minQuantity+1)+minQuantity;
     }
@@ -29,6 +31,12 @@ public abstract class QuantityCharacter {
 
     public List<Character> getCharSet() {
         return charSet;
+    }
+
+    public void setCharSet(String charSet) {
+        for(int i=0;i<charSet.length();i++){
+            addToSet(charSet.charAt(i));
+        }
     }
 
     public String generateSequence(String charSet) {
