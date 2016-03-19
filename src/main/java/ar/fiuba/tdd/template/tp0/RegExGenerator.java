@@ -1,33 +1,16 @@
 package ar.fiuba.tdd.template.tp0;
 
-import ar.fiuba.tdd.template.tp0.quantitycharacters.AsteriskCharacter;
-import ar.fiuba.tdd.template.tp0.quantitycharacters.PlusCharacter;
-import ar.fiuba.tdd.template.tp0.quantitycharacters.QuestionMarkCharacter;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.CharacterIterator;
+import java.util.*;
 
 public class RegExGenerator {
-    //private int maxLength;
-    private QuantityCharacter quantityCharacter;
-    private static Map<Character, QuantityCharacter> quantityCharacters = new HashMap<>();
-
-    static {
-        quantityCharacters.put('?', new QuestionMarkCharacter());
-        quantityCharacters.put('*', new AsteriskCharacter());
-        quantityCharacters.put('+', new PlusCharacter());
-    }
-
-    public RegExGenerator(/*int maxLength*/) {
-        //this.maxLength = maxLength;
-    }
+    RegExChar previousChar = null;
+    StringBuilder charSet = new StringBuilder();
 
     public List<String> generate(String regEx, int numberOfResults) {
         ArrayList<String> result = new ArrayList<>();
-        if(regEx!=null) {
-            for(int i=0;i<numberOfResults;i++){
+        if (regEx != null) {
+            for (int i = 0; i < numberOfResults; i++) {
                 result.add(generateOneMatchingString(regEx));
             }
         }
@@ -35,38 +18,53 @@ public class RegExGenerator {
     }
 
     private String generateOneMatchingString(String regEx) {
-        int position = 0;
+        resetVariables();
+        RegExCharIterator iterator = new RegExCharIterator(regEx);
         StringBuilder result = new StringBuilder();
-        StringBuilder charSet = new StringBuilder();
-        Character previousChar = null;
-        while (position < regEx.length()){
-            Character character = regEx.charAt(position);
-            if (quantityCharacters.containsKey(character)){
-                quantityCharacter = quantityCharacters.get(character);
-                quantityCharacter.setCharSet(charSet.toString());
-                result.append(quantityCharacter.generateSequence(charSet.toString()));
-            } else if(EscapeCharacters.isEscapeCharacter(character)) {
-                result.append(regEx.charAt(position+1));
-                position+=1;
-            } else if(GroupCharacters.isGroupCharacter(character)) {
-                Character endCharacter = GroupCharacters.getEndCharacterOf(character);
-                Character nextCharacter = regEx.charAt(++position);
-                while(!nextCharacter.equals(endCharacter)){
-                    charSet.append(nextCharacter);
-                    nextCharacter = regEx.charAt(++position);
+        while (iterator.hasNext()) {
+            RegExChar character = iterator.readNextCharacter();
+            if (SpecialCharacter.isSpecialCharacter(character.printLiteral())) {
+                if (charSet.length() == 0) {
+                    if (previousChar != null) {
+                        charSet.append(previousChar.printLiteral());
+                        previousChar = null;
+                    }
                 }
+                SpecialCharacter specialCharacter = new SpecialCharacter(character.printLiteral());
+                result.append(specialCharacter.operate(charSet, iterator));
             } else {
-                if(previousChar!=null) {
-                    result.append(previousChar);
-                }
+                appendPreviousIfNotNull(result);
                 previousChar = character;
-                charSet.append(character);
             }
-            position+=1;
         }
-        if(previousChar!=null) {
-            result.append(previousChar);
-        }
+        appendPreviousIfNotNull(result);
         return result.toString();
+    }
+
+    private void appendPreviousIfNotNull(StringBuilder stringToAppend) {
+        appendPreviousCharIfNotNull(stringToAppend);
+        appendOneIfCharSetNotEmpty(stringToAppend);
+    }
+
+    private void appendOneIfCharSetNotEmpty(StringBuilder stringToAppend) {
+        if (charSet.length() != 0) {
+            Random random = new Random();
+            Integer randomCharacterPosition = random.nextInt(charSet.length());
+            Character result = new RegExChar(charSet.toString().charAt(randomCharacterPosition)).printLiteral();
+            stringToAppend.append(result);
+            charSet = new StringBuilder();
+        }
+    }
+
+    private void appendPreviousCharIfNotNull(StringBuilder stringToAppend) {
+        if (previousChar != null) {
+            stringToAppend.append(previousChar.printLiteral());
+            previousChar = null;
+        }
+    }
+
+    private void resetVariables() {
+        previousChar = null;
+        charSet = new StringBuilder();
     }
 }
