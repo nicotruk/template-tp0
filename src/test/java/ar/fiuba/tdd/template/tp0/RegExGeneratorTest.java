@@ -64,4 +64,29 @@ public class RegExGeneratorTest {
     public void testSpecialCharacter() {
         assertTrue(validate("a+", 1));
     }
+
+    @Test
+    public void testSpecialCharactersInsideGroupTreatedAsLiterals() {
+        assertTrue(validate("[+?.*]", 1));
+    }
+
+    @Test
+    public void testJustLiterals() {
+        assertTrue(validate("justLiterals", 1));
+    }
+
+    @Test
+    public void testJustSpecialCharacters() {
+        assertTrue(validate(".*.+.?", 1));
+    }
+
+    @Test
+    public void testTwoGroups() {
+        assertTrue(validate("[abc][def]", 1));
+    }
+
+    @Test
+    public void testLiteralGroupLiteral() {
+        assertTrue(validate("a[group]b", 1));
+    }
 }

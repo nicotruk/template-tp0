@@ -1,15 +1,15 @@
 package ar.fiuba.tdd.template.tp0;
 
-public class RegExCharIterator {
+public class CharIterator {
     private String inputString;
     private int position = 0;
 
-    public RegExCharIterator(String inputString) {
+    public CharIterator(String inputString) {
         this.inputString = inputString;
     }
 
-    public RegExChar readNextCharacter() {
-        RegExChar next = new RegExChar(inputString.charAt(position));
+    public Character readNextCharacter() {
+        Character next = inputString.charAt(position);
         position++;
         return next;
     }
