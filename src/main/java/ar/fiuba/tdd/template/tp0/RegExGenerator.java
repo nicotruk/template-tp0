@@ -26,10 +26,12 @@ public class RegExGenerator {
                 result.append(specialCharacter.operate(charSet, iterator));
             } else {
                 appendOneIfCharSetNotEmpty(result);
+                charSet.delete(0, charSet.length());
                 charSet.append(character);
             }
         }
         appendOneIfCharSetNotEmpty(result);
+        charSet.delete(0, charSet.length());
         return result.toString();
     }
 
@@ -39,7 +41,6 @@ public class RegExGenerator {
             Integer randomCharacterPosition = random.nextInt(charSet.length());
             Character result = charSet.charAt(randomCharacterPosition);
             stringToAppend.append(result);
-            charSet = new StringBuilder();
         }
     }
 }
